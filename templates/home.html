@@ -17,20 +17,67 @@
     <!-- Page Content -->
     <div class="bg-gray-100 min-h-screen p-4">
         <!-- Books List -->
-        <div class="mt-20 mx-auto px-4 grid gap-6 grid-cols-1 md:grid-cols-4">
+        <div id="cardView" class="mt-20 mx-auto px-4 grid gap-6 grid-cols-1 md:grid-cols-4">
             {% for entry in books %}
                 <div class="bg-white shadow-md rounded-2xl p-6 space-y-2">
                     <h3 class="text-xl font-semibold text-gray-800"> {{ entry.book_title }} </h3>
-                    <p class="text-sm text-gray-500"><strong>Author</strong> {{ entry.author }}</p>
-                    <p class="text-sm text-gray-500"><strong>Genre</strong> {{ entry.genre }}</p>
-                    <p class="text-sm text-gray-500"><strong>Rating</strong> {{ entry.rating }}</p>
+                    <p class="text-gray-700"><strong>Author:</strong> {{ entry.author }}</p>
+                    <p class="text-gray-700"><strong>Genre:</strong> {{ entry.genre }}</p>
+                    <p class="text-gray-700"><strong>Rating:</strong> {{ entry.rating }}</p>
                     {% if entry.review %}
-                        <p class="text-gray-700 whitespace-pre-line mt-2">{{ entry.review }}</p>
+                        <p class="text-gray-700 whitespace-pre-line mt-2"><strong>Review:</strong> {{ entry.review }}</p>
                     {% endif %}
+
+                    <form action="{{ url_for('delete_entry', entry_id=entry.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this book?')">
+                        <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                            Remove
+                        </button>
+                    </form>
                 </div>
             {% else %}
                 <p class="text-gray-500 col-span-full text-center">No books added yet.</p>
             {% endfor %}
+        </div>
+        <div id="listView" class="hidden mt-20 max-w-4xl mx-auto px-4">
+            <table class="min-w-full bg-white shadow-md rounded-2xl overflow-hidden">
+                <thead class="bg-gray-200 text-left text-sm text-gray-700">
+                    <tr>
+                        <th class="p-3">Title</th>
+                        <th class="p-3">Author</th>
+                        <th class="p-3">Genre</th>
+                        <th class="p-3">Rating</th>
+                        <th class="p-3">Review</th>
+                        <th class="p-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-gray-800">
+                    {% for entry in books %}
+                        <tr class="border-t">
+                            <td class="p-3">{{ entry.book_title }}</td>
+                            <td class="p-3">{{ entry.author }}</td>
+                            <td class="p-3">{{ entry.genre }}</td>
+                            <td class="p-3">{{ entry.rating }}</td>
+                            <td class="p-3 whitespace-pre-line">{{ entry.review or "" }}</td>
+                            <td class="p=3">
+                                <form action="{{ url_for('delete_entry', entry_id=entry.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this book?')">
+                                    <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                                        Remove
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        
+
+        <!-- View Toggle Button -->
+        <div class="max-w-4xl mx-auto mt-8 px-4 flex justify-center">
+            <button id="toggleView" class="bg-gray-200 px-4 py-2 rounded-md shadow hover:bg-gray-300 transition">
+                Switch to List View
+            </button>
         </div>
 
         <!-- New Book Button-->
@@ -125,6 +172,17 @@
     
     <!-- JavaScript -->
     <script>
+        const cardView = document.getElementById("cardView");
+        const listView = document.getElementById("listView");
+        const toggleBtn = document.getElementById("toggleView");
+
+        toggleBtn.addEventListener("click", () => {
+            const isCardVisible = !cardView.classList.contains("hidden");
+            cardView.classList.toggle("hidden", isCardVisible);
+            listView.classList.toggle("hidden", !isCardVisible);
+            toggleBtn.textContent = isCardVisible ? "Switch to Card View" : "Switch to List View";
+        });
+
         function toggleModal(show) {
             document.getElementById("formModal").classList.toggle("hidden", !show)
         }

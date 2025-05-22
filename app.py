@@ -29,6 +29,13 @@ def clear_db():
     db.session.commit()
     return redirect(url_for("home"))
 
+@app.route("/delete/<int:entry_id>", methods=["POST"])
+def delete_entry(entry_id):
+    entry = Book.query.get_or_404(entry_id)
+    db.session.delete(entry)
+    db.session.commit()
+    return redirect(url_for("home"))
+
 
 @app.route("/submit", methods=["POST"])
 def submit():
